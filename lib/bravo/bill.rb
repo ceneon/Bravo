@@ -125,6 +125,11 @@ module Bravo
             "CbteFch" => related_invoice_data[:date]
           }]
         }
+      else
+        detail["PeriodoAsoc"] = {
+          "FchDesde" => fch_emision.beginning_of_month.strftime('%Y%m%d'),
+          "FchHasta" => fch_emision.strftime('%Y%m%d')
+        }
       end
 
       unless concepto == "Productos" # En "Productos" ("01"), si se mandan estos parámetros la afip rechaza.
