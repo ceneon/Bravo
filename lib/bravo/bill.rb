@@ -125,7 +125,7 @@ module Bravo
             "CbteFch" => related_invoice_data[:date]
           }]
         }
-      else
+      elsif ["02", "03", "07", "08"].include?(cbte_type) # NC/ND only
         detail["PeriodoAsoc"] = {
           "FchDesde" => fch_emision.beginning_of_month.strftime('%Y%m%d'),
           "FchHasta" => fch_emision.strftime('%Y%m%d')
