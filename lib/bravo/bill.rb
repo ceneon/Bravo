@@ -1,7 +1,8 @@
 module Bravo
   class Bill
     attr_reader :client, :base_imp, :total
-    attr_accessor :net, :doc_num, :iva_cond, :documento, :concepto, :moneda,
+    attr_accessor :net, :doc_num, :iva_cond, :recipient_iva_cond,
+      :documento, :concepto, :moneda,
       :due_date, :aliciva_id, :fch_serv_desde, :fch_serv_hasta,
       :body, :response
 
@@ -93,9 +94,15 @@ module Bravo
         }
       }
 
+      self.recipient_iva_cond = parse_iva_cond(self.recipient_iva_cond) if self.recipient_iva_cond.is_a?(Symbol)
+      if not self.recipient_iva_cond.is_a?(Integer)
+        raise "La condición IVA del receptor es un campo requerido desde 04/2025"
+      end
+
       detail = fecaereq['FeCAEReq']['FeDetReq']['FECAEDetRequest']
 
       detail['DocNro']    = self.doc_num
+      detail["CondicionIVAReceptorId"] = self.recipient_iva_cond
       detail['ImpNeto']   = self.net.to_f
       detail['ImpIVA']    = self.iva_sum
       detail['ImpTotal']  = self.total
@@ -206,6 +213,13 @@ module Bravo
       }.merge!(request_header).merge!(request_detail)
 
       self.response = Response.new(response_hash)
+    end
+
+    def parse_iva_cond(sym)
+      return 1 if sym == :responsable_inscripto
+      return 6 if sym == :monotributo
+      return 5 if sym == :consumidor_final
+      return 4 if sym == :exento
     end
   end
 end
