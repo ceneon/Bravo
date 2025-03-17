@@ -1,7 +1,8 @@
 module Bravo
   class Bill
     attr_reader :client, :base_imp, :total
-    attr_accessor :net, :doc_num, :iva_cond, :documento, :concepto, :moneda,
+    attr_accessor :net, :doc_num, :iva_cond, :recipient_iva_cond,
+                  :documento, :concepto, :moneda,
                   :due_date, :fch_serv_desde, :fch_serv_hasta, :fch_emision,
                   :body, :response, :ivas, :related_invoice_data
 
@@ -107,9 +108,15 @@ module Bravo
         raise "No incluir montos iva al facturar como Responsable Monotributo"
       end
 
+      self.recipient_iva_cond = parse_iva_cond(self.recipient_iva_cond) if self.recipient_iva_cond.is_a?(Symbol)
+      if not self.recipient_iva_cond.is_a?(Integer)
+        raise "La condición IVA del receptor es un campo requerido desde 04/2025"
+      end
+
       detail = fecaereq["FeCAEReq"]["FeDetReq"]["FECAEDetRequest"]
 
       detail["DocNro"]    = doc_num
+      detail["CondicionIVAReceptorId"] = self.recipient_iva_cond
       detail["ImpNeto"]   = net.to_f
       detail["ImpIVA"]    = iva_sum
       detail["ImpTotal"]  = total.round(2)
@@ -234,6 +241,13 @@ module Bravo
       #self.response = (defined?(Struct::Response) ? Struct::Response : Struct.new("Response", *keys)).new(*values)
       # Even if it throws a warning, it avoids some parsing errors.
       self.response = Struct.new("Response", *keys).new(*values)
+    end
+
+    def parse_iva_cond(sym)
+      return 1 if sym == :responsable_inscripto
+      return 6 if sym == :monotributo
+      return 5 if sym == :consumidor_final
+      return 4 if sym == :exento
     end
   end
 end
