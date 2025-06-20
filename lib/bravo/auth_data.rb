@@ -16,7 +16,8 @@ module Bravo
         opts += " -c #{Bravo.cert}" 
         opts += " -a #{todays_datafile}"
 
-        unless File.exists?(todays_datafile)
+        unless File.exists?(todays_datafile) and File.size(todays_datafile) > 29 # Avoid empty tokens
+          File.delete(todays_datafile) if File.exists?(todays_datafile)
           command = "#{File.dirname(__FILE__)}/../../wsaa-client.sh #{opts}"
           Rails.logger.warn "Haciendo request a WSAA: " + command
           rsp = %x(bash #{command} )
