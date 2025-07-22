@@ -110,7 +110,7 @@ module Bravo
 
       self.recipient_iva_cond = parse_iva_cond(self.recipient_iva_cond) if self.recipient_iva_cond.is_a?(Symbol)
       if not self.recipient_iva_cond.is_a?(Integer)
-        raise "La condición IVA del receptor es un campo requerido desde 04/2025"
+        raise "La condición IVA del receptor es un campo requerido desde el 1/8/2025"
       end
 
       detail = fecaereq["FeCAEReq"]["FeDetReq"]["FECAEDetRequest"]
