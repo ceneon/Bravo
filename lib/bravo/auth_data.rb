@@ -51,7 +51,7 @@ module Bravo
       end
 
       def todays_datafile
-        Dir.pwd + "/tmp/bravo_#{Bravo.cuit}_#{Time.new.strftime('%d_%m_%Y')}.yml"
+        Dir.pwd + "/tmp/bravo_#{Bravo.cuit}_#{Time.now.getlocal('-03:00').strftime('%d_%m_%Y')}.yml"
       end
 
     end
